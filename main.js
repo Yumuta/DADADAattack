@@ -111,7 +111,7 @@ function mainGame(corename){
     //-----------------bgm--------------------
     var bgm = corename.assets['bgm.mp3'];
     bgm.play();
-    bgm._element.loop = true;
+    bgm.src.loop = true;
     //--------player initialization-----------
     var self = new Sprite(64,64);
     self.image = corename.assets['dashman.png'];
