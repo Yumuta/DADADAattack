@@ -146,7 +146,7 @@ function mainGame(corename){
     gameScene.backgroundColor = danger_bg[danger_level-1];
     //-----------------bgm--------------------
     var bgm = corename.assets['bgm.mp3'];
-    bgm.volume = 0.5;
+    //bgm.volume = 0.5;
     bgm.play();
     bgm.src.loop = true;
     //----------------SE-------------------
