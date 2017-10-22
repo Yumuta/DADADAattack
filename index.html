@@ -7,17 +7,41 @@
         <meta name="apple-mobile-web-app-capable" content="yes"> 
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <title>DADADA attack version 171021</title>
+        <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
         <script type="text/javascript" src="enchant.js"></script>
+        <script type="text/javascript" src="ui.enchant.js"></script>
         <script type="text/javascript" src="main.js"></script>
-        <style type="text/css">
-            body {
-                margin: 0;
-                padding: 0;
-            }
-        </style>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     </head>
     <body>
+    <div class="container-fluid">
         <div id="enchant-stage"></div>
+        <div class="row">
+            <a id="tweetbtn" class="btn btn-large btn-info" href="http://twitter.com/intent/tweet?url=https://yumuta.github.io/DADADAattack/&text=DADADA attack!!&hashtags=DADADAattack"><i class="fa fa-twitter"></i> Share on Twitter</a>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <h2>What to do</h2>
+                <p>Run and avoid Dashman, Chaseman, and Ninjaman! You need to both survive and earn scores!</p>
+            </div> 
+            <div class="col-4">
+                <h2>Instruction</h2>
+                <ul>
+                    <li>Push Arrow Keys to <span class="text text-info">Move</span>.</li>
+                    <li>Push Z Key to <span class="text text-danger">Attack</span>.</li>
+                    <li>You can earn score +10 when your <span class="text text-danger">attack</span> hits enemy.</li>
+                    <li>Game is over when you collide with an enemy.</li>
+                </ul>
+            </div> 
+            <div class="col-4">
+                <h2>Credit</h2>
+                <p>This game uses <a href="http://enchantjs.com/ja/">enchant.js v0.8.3</a>.</p>
+            </div> 
+        </div>
+    </div>
     </body>
 </html>
 

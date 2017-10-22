@@ -45,6 +45,39 @@ var Chaseman = Class.create(Sprite,{
     }
 });
 
+var Ninjaman = Class.create(Sprite,{
+    initialize: function(corename, target, x, y, speed, accel){
+        Sprite.call(this, 64, 64);
+        this.x = x;
+        this.y = y;
+        this.state = 1;
+        this.image = corename.assets['dashman.png'];
+        this.muki = (this.x-target.x)<0;
+        var chase = 0;
+        var speed_x = speed;
+        var speed_y = 0;
+        var target_x = 0;
+        var target_y = 0;
+        this.on('enterframe',function(){
+            if(chase==0){
+                this.x += speed;
+            }else if(chase==1){
+                speed_x -= accel * (this.x-target_x) / Math.sqrt((this.x-target_x)**2+(this.y-target_y)**2);
+                speed_y -= accel * (this.y-target_y) / Math.sqrt((this.x-target_x)**2+(this.y-target_y)**2);
+                this.x += speed_x;
+                this.y += speed_y;
+            }
+            if(chase==0&&((speed>0&&this.x>target.x)||(speed<0&&this.x<target.x))){
+                target_x = target.x;
+                target_y = target.y;
+                chase = 1;
+            }
+            this.muki = (this.x-target.x)<0;         
+            this.frame = 12 + Number(this.age % 10 >= 5) + this.muki*2;
+        });
+    }
+});
+
 var Punch = Class.create(Sprite,{
     initialize: function(target, life){
         Sprite.call(this,64,64);
@@ -90,7 +123,38 @@ var Kage = Class.create(Sprite,{
     }
 });
 
-function title(corename){
+function init(corename){
+    var scene = new Scene();
+    scene.backgroundColor = '#CCCCCC';
+    corename.pushScene(scene);
+    // label
+    var label = new Label("Notice: Choose sound ON/OFF before you play game.");
+    label.width=corename.width;
+    label.font = 'bold 24px "Helvetica",serif';
+    scene.addChild(label);
+    // button
+    var button1 = new Button("Sound:ON","blue");
+    button1.width = 256;
+    button1.height = 56;
+    button1.font = 'bold 40px "Helvetica",serif';
+    button1.moveTo(64,212);
+    scene.addChild(button1);
+    var button2 = new Button("Sound:OFF","light");
+    button2.width = 256;
+    button2.height = 56;
+    button2.font = 'bold 40px "Helvetica",serif';
+    button2.moveTo(320,212);
+    scene.addChild(button2);   
+    button1.ontouchstart = function(){
+        corename.replaceScene(title(corename,true));
+    }
+    button2.ontouchstart = function(){
+        corename.replaceScene(title(corename,false));
+    }
+    return scene;
+}
+
+function title(corename,soundplay){
     var titleScene = new Scene();
     titleScene.backgroundColor = '#FFFFFF';
     corename.pushScene(titleScene);
@@ -100,18 +164,18 @@ function title(corename){
     titleImage.y = 0;
     titleScene.addChild(titleImage);
     titleScene.addEventListener(Event.TOUCH_START,function(){
-        corename.replaceScene(mainGame(corename));
+        corename.replaceScene(mainGame(corename,soundplay));
     });
     return titleScene;
 }
 
-function gameover(corename,score){
+function gameover(corename,score,soundplay){
     // Label
     var label = new Label;
     label.x = 240;
     label.y = 360;
     label.color = '#FF0000';
-    label.font = 'bold 48px "Times New Roman",serif';
+    label.font = 'bold 48px "Helvetica",serif';
     label.text = 'Score: '+score;
     // Scene
     var gameoverScene = new Scene();
@@ -123,13 +187,14 @@ function gameover(corename,score){
     gameoverImage.y = 0;
     gameoverScene.addChild(gameoverImage);
     gameoverScene.addEventListener(Event.TOUCH_START,function(){
-        corename.replaceScene(title(corename));
+        corename.replaceScene(title(corename,soundplay));
     });
     gameoverScene.addChild(label);
+    $('#tweetbtn').attr('href',"http://twitter.com/intent/tweet?url=https://yumuta.github.io/DADADAattack/&text=[Score:"+score+"] DADADA attackをプレイしました！&hashtags=DADADAattack");
     return gameoverScene;
 }
 
-function mainGame(corename){
+function mainGame(corename,soundplay){
     //----------initial settings--------------
     var gameScene = new Scene();
     corename.pushScene(gameScene);
@@ -138,7 +203,7 @@ function mainGame(corename){
     var label = new Label;
     label.x = 10;
     label.y = 10;
-    label.font = 'bold 32px "Times New Roman",serif';
+    label.font = 'bold 32px "Helvetica",serif';
     label.text = 'Score: '+score;
     //-------------danger level------------------
     var danger_level = Math.floor(score/100) + 1;
@@ -146,9 +211,10 @@ function mainGame(corename){
     gameScene.backgroundColor = danger_bg[danger_level-1];
     //-----------------bgm--------------------
     var bgm = corename.assets['bgm.mp3'];
-    //bgm.volume = 0.5;
-    bgm.play();
-    bgm.src.loop = true;
+    if(soundplay == true){
+        bgm.play();
+        bgm.src.loop = true;
+    }
     //----------------SE-------------------
     var scream = corename.assets['scream.mp3'].clone();
     var explode = corename.assets['explode.mp3'].clone();
@@ -178,6 +244,8 @@ function mainGame(corename){
     var dashman_interval = 30;
     // Chaseman
     var chaseman_interval = 60;
+    // Ninjaman
+    var ninjaman_interval = 100;
 
     // game draw in 60fps
     gameScene.addEventListener('enterframe',function(){
@@ -205,7 +273,6 @@ function mainGame(corename){
                 gameScene.addChild(dashman[dashman_id]);                
                 dashman_id++;
             }
-            if(dashman_id>=100) dashman_id = 0;
         }
 
         // create chaseman
@@ -216,8 +283,20 @@ function mainGame(corename){
             gameScene.addChild(dashman_kage[dashman_id]);
             gameScene.addChild(dashman[dashman_id]);
             dashman_id++;
-            if(dashman_id>=100) dashman_id = 0;
         }
+
+        // create Ninjaman
+        if(score>=400 && (corename.frame)%ninjaman_interval==0){
+            dashman[dashman_id] = new Ninjaman(corename, self, corename.width, rand(corename.height-64), -rand(10)-Math.floor(score/100)*2-4, 1);
+            dashman_kage[dashman_id] = new Kage(dashman[dashman_id]);
+            gameScene.addChild(dashman_kage[dashman_id]);
+            gameScene.addChild(dashman[dashman_id]);
+            dashman_id++;
+        }
+
+        if(dashman_id>500) dashman_id = 0;
+
+
     }); // end draw
 
     self.addEventListener('enterframe',function(){
@@ -245,16 +324,16 @@ function mainGame(corename){
             if(this.wazaCount>0) this.wazaCount--;
             if(corename.input.a){
                 if(this.wazaCount<=0){
-                    punch = new Punch(this,8);
+                    punch = new Punch(this,8+(score>400)*2);
                     gameScene.addChild(punch);
-                    this.wazaCount = 16;                   
+                    this.wazaCount = 16-(score>500)*4;                   
                 }
             }
             for(var i=0; i<dashman.length; i++){
                 if(punch.life !=0 && dashman[i].state==1 && punch.within(dashman[i],64)){
                     dashman[i].remove();
                     dashman_kage[i].remove();
-                    explode.play();
+                    if(soundplay==true) explode.play();
                     dashman[i].state=0;
                     punch.life=0;
                     score += 10;
@@ -269,8 +348,8 @@ function mainGame(corename){
                     this.remove();
                     self_kage.remove();
                     bgm.stop();
-                    scream.play();
-                    gameover(corename, score);
+                    if(soundplay==true) scream.play();
+                    gameover(corename, score, soundplay);
                 }
             }
     });
@@ -285,10 +364,10 @@ window.onload = function(){
     var screen_height = 480;
     var core = new Core(screen_width,screen_height);
     core.preload('DADAtitle.png', 'DADAover.png', 'dashman.png', 'bgm.mp3', 'scream.mp3', 'explode.mp3');
-    core.keybind(32,'a');
+    core.keybind(90,'a');
     core.fps = 30;
     core.onload = function(){
-        title(core);
+        init(core);
     };
     core.start();
 };
