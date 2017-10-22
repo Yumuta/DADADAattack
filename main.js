@@ -347,8 +347,10 @@ function mainGame(corename,soundplay){
                     label.remove();
                     this.remove();
                     self_kage.remove();
-                    bgm.stop();
-                    if(soundplay==true) scream.play();
+                    if(soundplay==true){
+                        bgm.stop();
+                        scream.play();
+                    }
                     gameover(corename, score, soundplay);
                 }
             }
